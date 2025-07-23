@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const authRoute = require("../routes/auth");
+const { router: authRoute, authenticateToken } = require("../routes/auth");
 const reservationRouter = require('../routes/reservations')
 
 dotenv.config();
@@ -12,7 +12,6 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api", reservationRouter); // where reservationRouter handles /reservations/:date
-
 app.use("/api/auth", authRoute);
 
 app.get("/", (req, res) => {
