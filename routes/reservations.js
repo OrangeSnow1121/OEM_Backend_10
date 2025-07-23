@@ -52,7 +52,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // Update note for a reservation (admin only)
-router.patch("/:id", authenticateToken, async (req, res) => {
+router.patch("/:id", verifyToken, async (req, res) => {
   if (req.user.role !== "admin") return res.sendStatus(403);
   try {
     const { note } = req.body;
@@ -64,7 +64,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 // Delete a reservation (admin only)
-router.delete("/:id", authenticateToken, async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   if (req.user.role !== "admin") return res.sendStatus(403);
   try {
     await Reservation.findByIdAndDelete(req.params.id);
