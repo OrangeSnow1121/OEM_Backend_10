@@ -51,6 +51,30 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+// Update note for a reservation (admin only)
+router.patch("/:id", authenticateToken, async (req, res) => {
+  if (req.user.role !== "admin") return res.sendStatus(403);
+  try {
+    const { note } = req.body;
+    const updated = await Reservation.findByIdAndUpdate(req.params.id, { note }, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: "Update failed" });
+  }
+});
+
+// Delete a reservation (admin only)
+router.delete("/:id", authenticateToken, async (req, res) => {
+  if (req.user.role !== "admin") return res.sendStatus(403);
+  try {
+    await Reservation.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(400).json({ message: "Delete failed" });
+  }
+});
+
+
 // GET all reservations
 router.get("/", async (req, res) => {
   try {
