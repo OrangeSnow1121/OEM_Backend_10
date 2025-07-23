@@ -10,11 +10,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use("/api", reservationRouter); // where reservationRouter handles /reservations/:date
+
 app.use("/api/auth", authRoute);
 
 app.get("/", (req, res) => {
   res.send("OEM Reservation Backend Running");
 });
+
+app.get('/api/reservations/:date', authenticateToken, async (req, res) => {
+  const date = req.params.date;
+  const reservations = await Reservation.find({ date });
+  res.json(reservations);
+});
+
+
 
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
