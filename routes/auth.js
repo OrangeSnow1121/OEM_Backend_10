@@ -5,7 +5,7 @@ const router = express.Router();
 const User = require("../models/User");
 
 // Use env variable or fallback for local testing
-const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
+const SECRET_KEY = process.env.JWT_SECRET || "fallback_value";
 
 // Middleware to verify JWT
 function authenticateToken(req, res, next) {
