@@ -2,35 +2,38 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const { router: authRoute, authenticateToken } = require("../routes/auth");
-const reservationRouter = require('../routes/reservations')
+const { router: authRoute } = require("../routes/auth");
+const reservationRouter = require('../routes/reservations');
 
 dotenv.config();
+
 const app = express();
 
-app.use(cors());
+// CORS configuration
+app.use(cors({
+  origin: "https://oem-reservation-frontend-26.vercel.app",
+  credentials: true
+}));
+
 app.use(express.json());
 
-app.use("/api", reservationRouter); // where reservationRouter handles /reservations/:date
-app.use("/api/auth", authRoute);
+// API routes
+app.use("/api/auth", authRoute);              // Handles login
+app.use("/api/reservations", reservationRouter); // Handles /api/reservations/*
 
 app.get("/", (req, res) => {
   res.send("OEM Reservation Backend Running");
 });
 
-app.get('/api/reservations/:date', authenticateToken, async (req, res) => {
-  const date = req.params.date;
-  const reservations = await Reservation.find({ date });
-  res.json(reservations);
-});
-
-
-
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => {
     console.log("Connected to MongoDB");
     app.listen(process.env.PORT || 8800, () => {
       console.log("Backend server running");
     });
   })
-  .catch(err => console.error(err));
+  .catch(err => console.error("MongoDB connection error:", err));
