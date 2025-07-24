@@ -75,15 +75,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 
-// GET all reservations
-router.get("/", async (req, res) => {
-  try {
-    const reservations = await Reservation.find().populate("user", "username");
-    res.json(reservations);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // GET reservations by date
 router.get("/:date", async (req, res) => {
@@ -95,14 +86,5 @@ router.get("/:date", async (req, res) => {
   }
 });
 
-// DELETE reservation by ID
-router.delete("/:id", verifyToken, async (req, res) => {
-  try {
-    await Reservation.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Reservation deleted" });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to delete reservation", error: err.message });
-  }
-});
 
 module.exports = router;
