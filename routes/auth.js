@@ -4,20 +4,26 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const User = require("../models/User");
 
-const SECRET_KEY = "your_secret_key";
+// Use env variable or fallback for local testing
+const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
 
+// Middleware to verify JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401);
+  if (!token) return res.status(401).json({ message: "No token provided" });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      console.error("JWT verification failed:", err.message);
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
     req.user = user;
     next();
   });
 }
 
+// POST /auth/login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -28,6 +34,7 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
+    // Generate token
     const token = jwt.sign({ username: user.username, role: user.role }, SECRET_KEY, {
       expiresIn: "1h"
     });
@@ -39,4 +46,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-module.exports = { router, authenticateToken };
+module.exports = {
+  router,
+  authenticateToken
+};
