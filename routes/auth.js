@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 
-// Dummy secret key — use a strong one in production
+// Dummy secret key — replace with env var in production
 const SECRET_KEY = "your_secret_key";
 
 // Middleware to authenticate token
@@ -25,16 +25,20 @@ router.get("/", (req, res) => {
 // Simulated login route
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
+
   if (username === "admin" && password === "Lyb9172800915!@#") {
-    const user = { username: "admin", role: "admin" };
+    const role = "admin";
+    const user = { username, role };
+
     const token = jwt.sign(user, SECRET_KEY, { expiresIn: "1h" });
-    return res.status(200).json({ token });
+
+    // ✅ Return both token and role explicitly
+    return res.status(200).json({ token, role });
   } else {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 });
 
-// Export both
 module.exports = {
   router,
   authenticateToken
